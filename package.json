@@ -1,0 +1,19 @@
+{
+  "name": "Musicgenius",
+  "version": "1.0.0",
+  "description": "Slack & Spotify Integration",
+  "main": "server.js",
+  "author": "Sunny Mistry",
+  "license": "MIT",
+  "scripts": {
+    "start": "nodemon server.js"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.4"
+  },
+  "dependencies": {
+    "axios": "^0.19.2",
+    "express": "^4.17.1",
+    "redis": "^3.0.2"
+  }
+}
