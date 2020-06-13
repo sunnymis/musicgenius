@@ -2,6 +2,9 @@ const axios = require('axios');
 const auth = require('../authentication');
 const redis = require('../redis');
 const constants = require('../constants');
+const util = require('./util');
+
+exports.util = util;
 
 exports.getAccessToken = (requestCode) => {
   return axios({
@@ -78,20 +81,19 @@ exports.getCurrentPlaylist = async () => {
   });
 }
 
-// const addSong = async (songId) => {
-//   const accessToken = await getValueFromRedis("accessToken");
+exports.addSongToPlaylist = async (songs) => {
+  const accessToken = await redis.getValue("accessToken");
+  const currentPlaylistId = await redis.getValue("currentPlaylistId");
 
-//   return axios({
-//     url: `https://api.spotify.com/v1/users/${SPOTIFY_USER}/playlists`,
-//     method: 'post',
-//     headers: {
-//       'Authorization': 'Bearer ' + accessToken
-//     },
-//     data: {
-//       name: 'my test playlist',
-//       public: false,
-//       collaborative: true,
-//       description: 'made from the api!'
-//     },
-//   });
-// }
+  return axios({
+    url: `https://api.spotify.com/v1/playlists/${currentPlaylistId}/tracks`,
+    method: 'post',
+    headers: {
+      'Authorization': 'Bearer ' + accessToken,
+      'Content-Type': 'application/json'
+    },
+    data: {
+      uris: songs
+    },
+  });
+}

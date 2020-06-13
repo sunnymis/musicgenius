@@ -50,3 +50,18 @@ exports.getById = (req, res) => {
       res.send('Error retrieved playlists');
     });
 }
+
+exports.add = (req, res) => {
+  const song = [spotify.util.getSongURI(req.body.song)];
+
+  spotify.addSongToPlaylist(song)
+    .then((response) => {
+      console.log('Adding song response: ', response.data)
+      res.send(`Successfully added song`);
+    })
+    .catch((error) => {
+      console.log('Adding song error: ', error);
+      console.log('Adding song error: ', error.response.data);
+      res.send('Error adding song');
+    });
+}
