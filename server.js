@@ -47,7 +47,8 @@ app.get('/authorized', (req, res) => {
 app.post('/create', (req, res) => {
   createPlaylist()
     .then((response) => {
-      console.log('Create Playlist response: ', response);
+      console.log('Create Playlist response: ', response.data);
+      redisClient.set("currentPlaylistId", response.data.id)
       res.send('Successfully created playlist'); // todo return playlist id
     })
     .catch((error) => {
@@ -65,6 +66,30 @@ app.get('/playlists', (req, res) => {
     .catch((error) => {
       console.log('Get Playlists error: ', error);
       res.send('Error retrieved playlists');
+    });
+});
+
+app.get('/playlists/:playlistId', (req, res) => {
+  getPlaylist(req.params.playlistId)
+    .then((response) => {
+      console.log('Getting Single Playlist response: ', response.data)
+      res.send(`Successfully retrieved single playlist ${req.params.playlistId}`);
+    })
+    .catch((error) => {
+      console.log('Get Playlists error: ', error);
+      res.send('Error retrieved playlists');
+    });
+});
+
+app.get('/playlist', (req, res) => {
+  getCurrentPlaylist()
+    .then((response) => {
+      console.log('Getting Current Playlist response: ', response.data)
+      res.send(`Successfully retrieved current playlist ${req.params.playlistId}`);
+    })
+    .catch((error) => {
+      console.log('Get Current Playlists error: ', error);
+      res.send('Error retrieving current playlist');
     });
 });
 
@@ -121,7 +146,7 @@ const createPlaylist = async () => {
       'Authorization': 'Bearer ' + accessToken
     },
     data: {
-      name: 'my test playlist',
+      name: 'my test playlist 2',
       public: false,
       collaborative: true,
       description: 'made from the api!'
@@ -136,6 +161,31 @@ const getPlaylists = async () => {
   const accessToken = await getValueFromRedis("accessToken");
   return axios({
     url: `https://api.spotify.com/v1/users/${SPOTIFY_USER}/playlists`,
+    method: 'get',
+    headers: {
+      'Authorization': 'Bearer ' + accessToken
+    },
+  });
+}
+
+const getPlaylist = async (playlistId) => {
+  const accessToken = await getValueFromRedis("accessToken");
+
+  return axios({
+    url: `https://api.spotify.com/v1/playlists/${playlistId}`,
+    method: 'get',
+    headers: {
+      'Authorization': 'Bearer ' + accessToken
+    },
+  });
+}
+
+const getCurrentPlaylist = async () => {
+  const accessToken = await getValueFromRedis("accessToken");
+  const currentPlaylistId = await getValueFromRedis("currentPlaylistId");
+
+  return axios({
+    url: `https://api.spotify.com/v1/playlists/${currentPlaylistId}`,
     method: 'get',
     headers: {
       'Authorization': 'Bearer ' + accessToken
