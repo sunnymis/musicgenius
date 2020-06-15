@@ -48,9 +48,8 @@ exports.getRefreshToken = async (retryRequestData) => {
     });
 };
 
-exports.createPlaylist = async () => {
+exports.createPlaylist = async (data) => {
   const accessToken = await redis.getValue("accessToken");
-
   return axios({
     url: `https://api.spotify.com/v1/users/${constants.SPOTIFY_USER}/playlists`,
     method: 'post',
@@ -58,12 +57,10 @@ exports.createPlaylist = async () => {
       'Authorization': 'Bearer ' + accessToken
     },
     data: {
-      name: 'my test playlist 3',
       public: false,
       collaborative: true,
-      description: 'made from the api 3!'
+      ...data,
     },
-    // json: true
   });
 };
 

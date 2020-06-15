@@ -3,7 +3,7 @@ const redis = require('../redis');
 const get = require('lodash/get');
 
 exports.create = (req, res) => {
-  spotify.createPlaylist()
+  spotify.createPlaylist(req.body)
     .then((response) => {
       console.log('Create Playlist response: ', response.data);
       redis.client.set("currentPlaylistId", response.data.id)

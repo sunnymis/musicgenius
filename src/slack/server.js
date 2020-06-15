@@ -6,7 +6,7 @@ const port = 4000;
 const constants = require('../constants');
 const crypto = require('crypto');
 
-app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }))
 
 app.listen(port, () => {
   console.log(`Slack Server started. Listening on http://localhost:${port}`)
@@ -19,7 +19,7 @@ app.post('/', (req, res) => {
     if (req.body.event.text) {
       if (req.body.event.text.includes("https://open.spotify.com/track")) {
         axios({
-          url: `${constants.CREATE_PLAYLIST_URL}`,
+          url: `${constants.ADD_SONG_TO_PLAYLIST_URL}`,
           method: 'post',
           data: {
             song: req.body.event.text
@@ -32,6 +32,29 @@ app.post('/', (req, res) => {
   }
 
   res.send(req.body.challenge);
+});
+
+app.post('/command', (req, res) => {
+  // todo make checks for team domain and channel name  in req.body
+  const { text } = req.body;
+
+  const [name, description] = text.split(',');
+
+  console.log('name description', name, description);
+  console.log('url', constants.CREATE_PLAYLIST_URL);
+  axios({
+    url: `${constants.CREATE_PLAYLIST_URL}`,
+    method: 'post',
+    data: {
+      name,
+      description,
+    }
+  })
+    .then(resp => console.log('succ resp', resp))
+    .catch(err => console.log('err', err));
+
+  //todo send back spotify URL of newly created
+  res.send('??');
 });
 
 const validateSlackRequest = (request) => {
