@@ -1,5 +1,6 @@
 const spotify = require('../spotify');
 const redis = require('../redis');
+const get = require('lodash/get');
 
 exports.create = (req, res) => {
   spotify.createPlaylist()
@@ -33,8 +34,9 @@ exports.getAll = (req, res) => {
       console.log('Getting Playlists response: ', response.data)
       res.send('Successfully retrieved playlists');
     })
-    .catch((error) => {
-      console.log('Get Playlists error: ', error);
+    .catch((err) => {
+      handleExpiredAccessToken(err);
+      console.log('Get Playlists error: ', err.response.data);
       res.send('Error retrieved playlists');
     });
 }
@@ -64,4 +66,14 @@ exports.add = (req, res) => {
       console.log('Adding song error: ', error.response.data);
       res.send('Error adding song');
     });
+}
+
+const handleExpiredAccessToken = (err) => {
+  const error = get(err, 'response.data.error', null);
+
+  if (error) {
+    if (error.status === 401 && error.message === 'The access token expired') {
+      spotify.getRefreshToken();
+    }
+  }
 }

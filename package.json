@@ -6,7 +6,8 @@
   "author": "Sunny Mistry",
   "license": "MIT",
   "scripts": {
-    "start": "nodemon src/index.js"
+    "start": "nodemon src/index.js",
+    "slack": "nodemon src/slack/server.js"
   },
   "devDependencies": {
     "nodemon": "^2.0.4"
@@ -15,6 +16,7 @@
     "axios": "^0.19.2",
     "body-parser": "^1.19.0",
     "express": "^4.17.1",
+    "lodash": "^4.17.15",
     "redis": "^3.0.2"
   }
 }

@@ -23,6 +23,31 @@ exports.getAccessToken = (requestCode) => {
   });
 };
 
+exports.getRefreshToken = async () => {
+  const refreshToken = await redis.getValue("refreshToken");
+  console.log('getting refresh token...');
+  axios({
+    url: 'https://accounts.spotify.com/api/token',
+    method: 'post',
+    params: {
+      grant_type: 'refresh_token',
+      refresh_token: refreshToken,
+    },
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/x-www-form-urlencoded',
+      'Authorization': `Basic ${auth.encodeAuthorizationToBase64()}`
+    },
+  })
+    .then(response => {
+      redis.client.set("accessToken", response.data.access_token, redis.print);
+      console.log('new access token', response.data.access_token);
+    })
+    .catch(error => {
+      console.log("Err GRT: ", error);
+    });
+};
+
 exports.createPlaylist = async () => {
   const accessToken = await redis.getValue("accessToken");
 
