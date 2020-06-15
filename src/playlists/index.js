@@ -16,6 +16,25 @@ exports.create = (req, res) => {
     });
 }
 
+exports.edit = (req, res) => {
+  spotify.editPlaylist(req.body)
+    .then((response) => {
+      console.log('Edit Playlist response: ', response.data);
+      res.send('Successfully edited playlist'); // todo return playlist id
+    })
+    .catch((error) => {
+      console.log(req.body);
+      const requestData = {
+        type: "EDIT",
+        body: req.body
+      }
+      console.log('failed edit');
+      console.log('retry request data', requestData);
+      handleExpiredAccessToken(error, requestData);
+      res.send('Error editing playlist');
+    });
+}
+
 exports.getCurrent = (req, res) => {
   spotify.getCurrentPlaylist()
     .then((response) => {
@@ -68,12 +87,12 @@ exports.add = (req, res) => {
     });
 }
 
-const handleExpiredAccessToken = (err) => {
+const handleExpiredAccessToken = (err, requestData) => {
   const error = get(err, 'response.data.error', null);
 
   if (error) {
     if (error.status === 401 && error.message === 'The access token expired') {
-      spotify.getRefreshToken();
+      spotify.getRefreshToken(requestData);
     }
   }
 }

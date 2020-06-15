@@ -23,7 +23,7 @@ exports.getAccessToken = (requestCode) => {
   });
 };
 
-exports.getRefreshToken = async () => {
+exports.getRefreshToken = async (retryRequestData) => {
   const refreshToken = await redis.getValue("refreshToken");
   console.log('getting refresh token...');
   axios({
@@ -40,7 +40,7 @@ exports.getRefreshToken = async () => {
     },
   })
     .then(response => {
-      redis.client.set("accessToken", response.data.access_token, redis.print);
+      redis.client.set("accessToken", response.data.access_token, retryRequest(retryRequestData));
       console.log('new access token', response.data.access_token);
     })
     .catch(error => {
@@ -66,6 +66,31 @@ exports.createPlaylist = async () => {
     // json: true
   });
 };
+
+exports.editPlaylist = async (data) => {
+  console.log('in edit playlist');
+  const accessToken = await redis.getValue("accessToken");
+  const currentPlaylistId = await redis.getValue("currentPlaylistId");
+
+  return axios({
+    url: `https://api.spotify.com/v1/playlists/${currentPlaylistId}`,
+    method: 'put',
+    headers: {
+      'Authorization': 'Bearer ' + accessToken
+    },
+    data,
+  });
+};
+
+const retryRequest = (requestData) => {
+  console.log('retry request');
+  if (requestData.type === "EDIT") {
+    console.log('retry request EDIT');
+    exports.editPlaylist(requestData.body)
+      .then(resp => console.log('edit playlist retry', resp))
+      .catch(err => console.log('edit playlist retry error', err))
+  }
+}
 
 //todo get specific playlist by id
 // save id in redis after the create call
