@@ -7,7 +7,7 @@ exports.create = (req, res) => {
     .then((response) => {
       console.log('Create Playlist response: ', response.data);
       redis.client.set("currentPlaylistId", response.data.id)
-      res.send('Successfully created playlist'); // todo return playlist id
+      res.send(response.data.external_urls.spotify);
     })
     .catch((error) => {
       console.log('Create Playlist error: ', error);
@@ -16,11 +16,13 @@ exports.create = (req, res) => {
     });
 }
 
-exports.edit = (req, res) => {
+exports.edit = async (req, res) => {
+  await spotify.getRefreshToken()
+
   spotify.editPlaylist(req.body)
     .then((response) => {
       console.log('Edit Playlist response: ', response.data);
-      res.send('Successfully edited playlist'); // todo return playlist id
+      res.send('Successfully edited playlist');
     })
     .catch((error) => {
       console.log(req.body);
@@ -47,7 +49,9 @@ exports.getCurrent = (req, res) => {
     });
 }
 
-exports.getAll = (req, res) => {
+exports.getAll = async (req, res) => {
+  await spotify.getRefreshToken();
+
   spotify.getPlaylists()
     .then((response) => {
       console.log('Getting Playlists response: ', response.data)

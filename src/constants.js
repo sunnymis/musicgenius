@@ -1,4 +1,4 @@
-const BASE_SERVER_URL = 'https://5c431c3ac3b3.ngrok.io'
+const BASE_SERVER_URL = 'https://0d5da11b8cf9.ngrok.io'
 exports.REDIRECT_URI = `${BASE_SERVER_URL}/authorized`;
 exports.ADD_SONG_TO_PLAYLIST_URL = `${BASE_SERVER_URL}/playlists`;
 exports.CREATE_PLAYLIST_URL = `${BASE_SERVER_URL}/create`;

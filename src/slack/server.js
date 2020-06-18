@@ -7,13 +7,14 @@ const constants = require('../constants');
 const crypto = require('crypto');
 
 app.use(bodyParser.urlencoded({ extended: true }))
+app.use(bodyParser.json())
 
 app.listen(port, () => {
   console.log(`Slack Server started. Listening on http://localhost:${port}`)
 });
 
 app.post('/', (req, res) => {
-  if (!validateSlackRequest(req)) { console.log('validation failed'); return; }
+  // if (!validateSlackRequest(req)) { console.log('validation failed'); return; }
 
   if (req.body.event && req.body.event.type === 'message') {
     if (req.body.event.text) {
@@ -50,11 +51,22 @@ app.post('/command', (req, res) => {
       description,
     }
   })
-    .then(resp => console.log('succ resp', resp))
-    .catch(err => console.log('err', err));
+    .then(resp => {
+      console.log('succ resp', resp)
 
-  //todo send back spotify URL of newly created
-  res.send('??');
+      const responseJSON = JSON.stringify({
+        "response_type": "in_channel",
+        "text": `Here\'s your playlist!\n ${resp.data}`
+      });
+
+      res.setHeader('Content-Type', 'application/json');
+      res.send(responseJSON);
+    })
+    .catch(err => {
+      console.log('err', err)
+
+      res.send('Whoops! Something went wrong creating a playlist', err);
+    });
 });
 
 const validateSlackRequest = (request) => {

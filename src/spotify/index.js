@@ -25,7 +25,8 @@ exports.getAccessToken = (requestCode) => {
 
 exports.getRefreshToken = async (retryRequestData) => {
   const refreshToken = await redis.getValue("refreshToken");
-  console.log('getting refresh token...');
+  console.log('getting refresh token...', refreshToken);
+
   axios({
     url: 'https://accounts.spotify.com/api/token',
     method: 'post',
@@ -40,7 +41,15 @@ exports.getRefreshToken = async (retryRequestData) => {
     },
   })
     .then(response => {
-      redis.client.set("accessToken", response.data.access_token, retryRequest(retryRequestData));
+      if (retryRequestData) {
+        redis.client.set("accessToken", response.data.access_token, retryRequest(retryRequestData));
+      } else {
+        redis.client.set("accessToken", response.data.access_token, () => {
+          console.log('sleeping for 5 seconds');
+          setTimeout(() => { }, 5000);
+        });
+      }
+
       console.log('new access token', response.data.access_token);
     })
     .catch(error => {
