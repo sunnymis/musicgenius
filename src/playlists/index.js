@@ -2,7 +2,9 @@ const spotify = require('../spotify');
 const redis = require('../redis');
 const get = require('lodash/get');
 
-exports.create = (req, res) => {
+exports.create = async (req, res) => {
+  await spotify.getRefreshToken();
+
   spotify.createPlaylist(req.body)
     .then((response) => {
       console.log('Create Playlist response: ', response.data);
