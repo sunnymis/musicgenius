@@ -1,7 +1,7 @@
 <h1 align="center"> Musicgenius </h1>
 
 <h3 align="center">
-  Slack & Spotify Integration
+Add Spotify Songs Sent via Slack to a Playlist
 </h3>
 
 
