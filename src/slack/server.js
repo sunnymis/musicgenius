@@ -23,22 +23,25 @@ app.listen(portCommands, () => {
 });
 
 
-slackEvents.on('message', (event) => {
+slackEvents.on('message', async (event) => {
   if (event.type === 'message') {
     if (event.text && event.text.includes("https://open.spotify.com/track")) {
-      axios({
-        url: `${constants.ADD_SONG_TO_PLAYLIST_URL}`,
-        method: 'post',
-        data: {
-          song: event.text
-        }
-      })
-        .then(resp => console.log('success resp', resp))
-        .catch(err => console.log('err', err));
+      try {
+        const response = await axios({
+          url: `${constants.ADD_SONG_TO_PLAYLIST_URL}`,
+          method: 'post',
+          data: {
+            song: event.text
+          }
+        });
+
+        console.log('successful add song response', response);
+      } catch (error) {
+        console.log('Error adding song', error)
+      }
     }
   }
 });
-
 
 app.post('/command', async (req, res) => {
   try {
