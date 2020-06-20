@@ -72,7 +72,7 @@ exports.getAll = async (req, res) => {
 exports.getById = async (req, res) => {
   try {
     const grt = await spotify.getRefreshToken();
-    console.log('GRT From getAll', grt);
+    console.log('GRT From getById', grt);
 
     const response = await spotify.getPlaylist(req.params.playlistId);
     console.log('Getting Single Playlist response: ', response.data)
@@ -84,19 +84,24 @@ exports.getById = async (req, res) => {
   }
 }
 
-exports.add = (req, res) => {
-  const song = [spotify.util.getSongURI(req.body.song)];
+exports.add = async (req, res) => {
+  try {
+    const grt = await spotify.getRefreshToken();
+    console.log('GRT From add', grt);
 
-  spotify.addSongToPlaylist(song)
-    .then((response) => {
-      console.log('Adding song response: ', response.data)
-      res.send(`Successfully added song`);
-    })
-    .catch((error) => {
-      console.log('Adding song error: ', error);
-      console.log('Adding song error: ', error.response.data);
-      res.send('Error adding song');
-    });
+    const song = spotify.util.getSongURI(req.body.song);
+    console.log('song to add is', song);
+
+    const response = await spotify.addSongToPlaylist([song]);
+    console.log('Adding song response: ', response.data);
+
+    res.send(`Successfully added song`);
+  } catch (error) {
+    console.log('Adding song error: ', error);
+    console.log('Adding song error: ', error.response.data);
+
+    res.send('Error adding song');
+  }
 }
 
 const handleExpiredAccessToken = (err, requestData) => {
