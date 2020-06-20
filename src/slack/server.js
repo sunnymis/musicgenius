@@ -40,32 +40,32 @@ slackEvents.on('message', (event) => {
 });
 
 
-app.post('/command', (req, res) => {
-  const { text } = req.body;
-  const [name, description] = text.split(',');
+app.post('/command', async (req, res) => {
+  try {
+    const { text } = req.body;
+    const [name, description] = text.split(',');
 
-  axios({
-    url: `${constants.CREATE_PLAYLIST_URL}`,
-    method: 'post',
-    data: {
-      name,
-      description,
-    }
-  })
-    .then(resp => {
-      console.log('succ resp', resp)
-
-      const responseJSON = JSON.stringify({
-        "response_type": "in_channel",
-        "text": `Here\'s your playlist!\n ${resp.data}`
-      });
-
-      res.setHeader('Content-Type', 'application/json');
-      res.send(responseJSON);
-    })
-    .catch(err => {
-      console.log('err', err)
-
-      res.send('Whoops! Something went wrong creating a playlist', err);
+    const response = await axios({
+      url: `${constants.CREATE_PLAYLIST_URL}`,
+      method: 'post',
+      data: {
+        name,
+        description,
+      }
     });
-});
+
+    console.log('succesful create playlist response', response);
+
+    const responseJSON = JSON.stringify({
+      "response_type": "in_channel",
+      "text": `Here\'s your playlist!\n ${response.data}`
+    });
+
+    res.setHeader('Content-Type', 'application/json');
+    res.send(responseJSON);
+  } catch (error) {
+    console.log('Error creating playlist', error)
+
+    res.send('Whoops! Something went wrong creating a playlist', error);
+  }
+}
