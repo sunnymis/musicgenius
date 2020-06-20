@@ -22,24 +22,20 @@ exports.create = async (req, res) => {
 }
 
 exports.edit = async (req, res) => {
-  await spotify.getRefreshToken()
+  try {
+    const grt = await spotify.getRefreshToken();
+    console.log('GRT From edit', grt);
 
-  spotify.editPlaylist(req.body)
-    .then((response) => {
-      console.log('Edit Playlist response: ', response.data);
-      res.send('Successfully edited playlist');
-    })
-    .catch((error) => {
-      console.log(req.body);
-      const requestData = {
-        type: "EDIT",
-        body: req.body
-      }
-      console.log('failed edit');
-      console.log('retry request data', requestData);
-      handleExpiredAccessToken(error, requestData);
-      res.send('Error editing playlist');
-    });
+    const response = await spotify.editPlaylist(req.body)
+    console.log('Edit Playlist response: ', response.data);
+
+    res.send('Successfully edited playlist');
+  } catch (error) {
+    console.log('Edit Playlist error: ', error);
+    console.log('Edit Playlist error: ', error.response);
+
+    res.send('Error creating playlist');
+  }
 }
 
 exports.getCurrent = (req, res) => {
