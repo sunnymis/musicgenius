@@ -38,16 +38,20 @@ exports.edit = async (req, res) => {
   }
 }
 
-exports.getCurrent = (req, res) => {
-  spotify.getCurrentPlaylist()
-    .then((response) => {
-      console.log('Getting Current Playlist response: ', response.data)
-      res.send(`Successfully retrieved current playlist ${response.data.id}`);
-    })
-    .catch((error) => {
-      console.log('Get Current Playlists error: ', error);
-      res.send('Error retrieving current playlist');
-    });
+exports.getCurrent = async (req, res) => {
+  try {
+    const grt = await spotify.getRefreshToken();
+    console.log('GRT From get current playlist', grt);
+
+    const response = await spotify.getCurrentPlaylist();
+    console.log('Getting Current Playlist response: ', response.data)
+
+    res.send(`Successfully retrieved current playlist ${response.data.id}`);
+  } catch (error) {
+    console.log('Get Current Playlists error: ', error);
+
+    res.send('Error retrieving current playlist');
+  }
 }
 
 exports.getAll = async (req, res) => {
