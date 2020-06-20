@@ -13,27 +13,23 @@ exports.getUrl = (req, res) => {
   res.send(url);
 };
 
-exports.authorizationCallback = (req, res) => {
-  const requestCode = req.query.code;
+exports.authorizationCallback = async (req, res) => {
+  try {
+    const requestCode = req.query.code;
+    const response = await spotify.getAccessToken(requestCode);
 
-  // Request refresh and access tokens
-  spotify.getAccessToken(requestCode)
-    .then((response) => {
-      console.log('printing redis set and get --------------------');
+    redis.client.set("accessToken", response.data.access_token, redis.print);
+    redis.client.set("expiresIn", response.data.expires_in, redis.print);
+    redis.client.set("refreshToken", response.data.refresh_token, redis.print);
 
-      redis.client.set("accessToken", response.data.access_token, redis.print);
-      redis.client.set("expiresIn", response.data.expires_in, redis.print);
-      redis.client.set("refreshToken", response.data.refresh_token, redis.print);
+    redis.client.get("accessToken", redis.print);
+    redis.client.get("expiresIn", redis.print);
+    redis.client.get("refreshToken", redis.print);
 
-      redis.client.get("accessToken", redis.print);
-      redis.client.get("expiresIn", redis.print);
-      redis.client.get("refreshToken", redis.print);
-    })
-    .catch((error) => {
-      console.log('getAccessToken error:', error);
-    })
-
-  res.send('Successfully authenticated with Spotify');
+    res.send('Successfully authenticated with Spotify');
+  } catch (error) {
+    console.log('getAccessToken error:', error);
+  };
 }
 
 exports.encodeAuthorizationToBase64 = () => {

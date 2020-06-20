@@ -24,37 +24,39 @@ exports.getAccessToken = (requestCode) => {
 };
 
 exports.getRefreshToken = async (retryRequestData) => {
-  const refreshToken = await redis.getValue("refreshToken");
-  console.log('getting refresh token...', refreshToken);
+  try {
+    const refreshToken = await redis.getValue("refreshToken");
+    console.log('getting refresh token...', refreshToken);
 
-  axios({
-    url: 'https://accounts.spotify.com/api/token',
-    method: 'post',
-    params: {
-      grant_type: 'refresh_token',
-      refresh_token: refreshToken,
-    },
-    headers: {
-      'Accept': 'application/json',
-      'Content-Type': 'application/x-www-form-urlencoded',
-      'Authorization': `Basic ${auth.encodeAuthorizationToBase64()}`
-    },
-  })
-    .then(response => {
-      if (retryRequestData) {
-        redis.client.set("accessToken", response.data.access_token, retryRequest(retryRequestData));
-      } else {
-        redis.client.set("accessToken", response.data.access_token, () => {
-          console.log('sleeping for 5 seconds');
-          setTimeout(() => { }, 5000);
-        });
-      }
-
-      console.log('new access token', response.data.access_token);
-    })
-    .catch(error => {
-      console.log("Err GRT: ", error);
+    const response = await axios({
+      url: 'https://accounts.spotify.com/api/token',
+      method: 'post',
+      params: {
+        grant_type: 'refresh_token',
+        refresh_token: refreshToken,
+      },
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Authorization': `Basic ${auth.encodeAuthorizationToBase64()}`
+      },
     });
+
+    console.log('api/token response', response)
+
+    const newAccessToken = response.data.access_token;
+
+    console.log('newAccessToken:', newAccessToken)
+
+    const redisResult = await redis.setValue("accessToken", newAccessToken);
+
+    console.log('redisResult', redisResult);
+
+    return newAccessToken;
+
+  } catch (error) {
+    console.log("Err Getting Refresh Token: ", error);
+  }
 };
 
 exports.createPlaylist = async (data) => {
