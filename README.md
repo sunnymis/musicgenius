@@ -78,3 +78,21 @@
     ```
     
 3. 3000 is the port number
+
+## How it Works
+
+### Overview
+
+![Overview Diagram](docs/overview.jpg)
+
+### Authentication
+
+![Authentication Diagram](docs/authentication.jpg)
+
+### Creating a Playlist
+
+![Creating a Playlist Diagram](docs/creating-a-playlist.jpg)
+
+### Adding a Song
+
+![Adding a Song Diagram](docs/adding-a-song.jpg)
