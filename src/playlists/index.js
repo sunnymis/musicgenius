@@ -3,19 +3,22 @@ const redis = require('../redis');
 const get = require('lodash/get');
 
 exports.create = async (req, res) => {
-  await spotify.getRefreshToken();
+  try {
+    const grt = await spotify.getRefreshToken();
+    console.log('GRT From create', grt);
 
-  spotify.createPlaylist(req.body)
-    .then((response) => {
-      console.log('Create Playlist response: ', response.data);
-      redis.client.set("currentPlaylistId", response.data.id)
-      res.send(response.data.external_urls.spotify);
-    })
-    .catch((error) => {
-      console.log('Create Playlist error: ', error);
-      console.log('Create Playlist error: ', error.response);
-      res.send('Error creating playlist');
-    });
+    const response = await spotify.createPlaylist(req.body)
+    console.log('Create Playlist response: ', response.data);
+
+    const redisResult = await redis.setValue("currentPlaylistId", response.data.id);
+    console.log('redisResult currentPlaylistId', redisResult);
+
+    res.send(response.data.external_urls.spotify);
+  } catch (error) {
+    console.log('Create Playlist error: ', error);
+    console.log('Create Playlist error: ', error.response);
+    res.send('Error creating playlist');
+  }
 }
 
 exports.edit = async (req, res) => {
