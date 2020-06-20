@@ -55,30 +55,33 @@ exports.getCurrent = async (req, res) => {
 }
 
 exports.getAll = async (req, res) => {
-  console.log('trying getAll request');
   try {
     const grt = await spotify.getRefreshToken();
     console.log('GRT From getAll', grt);
+
     const playlistResponse = await spotify.getPlaylists();
     console.log('Getting Playlists response: ', playlistResponse.data)
-    res.send('Successfully retrieved playlists');
 
+    res.send('Successfully retrieved playlists');
   } catch (error) {
     console.log('Get Playlists error: ', err.response.data);
     res.send('Error retrieved playlists');
   }
 }
 
-exports.getById = (req, res) => {
-  spotify.getPlaylist(req.params.playlistId)
-    .then((response) => {
-      console.log('Getting Single Playlist response: ', response.data)
-      res.send(`Successfully retrieved single playlist ${req.params.playlistId}`);
-    })
-    .catch((error) => {
-      console.log('Get Playlists error: ', error);
-      res.send('Error retrieved playlists');
-    });
+exports.getById = async (req, res) => {
+  try {
+    const grt = await spotify.getRefreshToken();
+    console.log('GRT From getAll', grt);
+
+    const response = await spotify.getPlaylist(req.params.playlistId);
+    console.log('Getting Single Playlist response: ', response.data)
+
+    res.send(`Successfully retrieved single playlist ${req.params.playlistId}`);
+  } catch (error) {
+    console.log('Get Playlist By Id error: ', error);
+    res.send('Error retrieved playlists');
+  }
 }
 
 exports.add = (req, res) => {
