@@ -52,18 +52,18 @@ exports.getCurrent = (req, res) => {
 }
 
 exports.getAll = async (req, res) => {
-  await spotify.getRefreshToken();
+  console.log('trying getAll request');
+  try {
+    const grt = await spotify.getRefreshToken();
+    console.log('GRT From getAll', grt);
+    const playlistResponse = await spotify.getPlaylists();
+    console.log('Getting Playlists response: ', playlistResponse.data)
+    res.send('Successfully retrieved playlists');
 
-  spotify.getPlaylists()
-    .then((response) => {
-      console.log('Getting Playlists response: ', response.data)
-      res.send('Successfully retrieved playlists');
-    })
-    .catch((err) => {
-      handleExpiredAccessToken(err);
-      console.log('Get Playlists error: ', err.response.data);
-      res.send('Error retrieved playlists');
-    });
+  } catch (error) {
+    console.log('Get Playlists error: ', err.response.data);
+    res.send('Error retrieved playlists');
+  }
 }
 
 exports.getById = (req, res) => {
