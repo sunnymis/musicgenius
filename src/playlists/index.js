@@ -18,7 +18,7 @@ exports.create = async (req, res) => {
   }
 }
 
-exports.edit = async (req, res) => {
+exports.editCurrent = async (req, res) => {
   try {
     await spotify.getRefreshToken();
 
