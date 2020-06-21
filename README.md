@@ -1,8 +1,17 @@
 <h1 align="center"> Musicgenius </h1>
 
 <h3 align="center">
-Add Spotify Songs Sent via Slack to a Playlist
+Create Spotify Playlists and Add Songs via Slack
 </h3>
+
+## Demo
+
+![Demo Gif](docs/demo.gif)
+
+## Features
+
+- Create a playlist directly from Slack using a Slash Commands `/create-playlist name, description`
+- Add songs to a playlist whenever they are sent as Slack messages
 
 ## Setting Up for Local Dev
 
