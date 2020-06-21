@@ -15,7 +15,7 @@ app.use(bodyParser.json());
 
 (async () => {
   const server = await slackEvents.start(portEvents);
-  console.log(`Listening for events on ${server.address().portEvents}`);
+  console.log(`Listening for events on ${server.address().port}`);
 })();
 
 app.listen(portCommands, () => {
@@ -35,7 +35,7 @@ slackEvents.on('message', async (event) => {
           }
         });
 
-        console.log('successful add song response', response);
+        console.log('Successfully added song', response.status, response.statusText);
       } catch (error) {
         console.log('Error adding song', error)
       }
@@ -57,7 +57,7 @@ app.post('/command', async (req, res) => {
       }
     });
 
-    console.log('succesful create playlist response', response);
+    console.log('Successfully created playlist', response);
 
     const responseJSON = JSON.stringify({
       "response_type": "in_channel",
@@ -71,4 +71,4 @@ app.post('/command', async (req, res) => {
 
     res.send('Whoops! Something went wrong creating a playlist', error);
   }
-}
+});

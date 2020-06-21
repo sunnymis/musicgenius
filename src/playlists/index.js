@@ -4,27 +4,23 @@ const get = require('lodash/get');
 
 exports.create = async (req, res) => {
   try {
-    const grt = await spotify.getRefreshToken();
-    console.log('GRT From create', grt);
+    await spotify.getRefreshToken();
 
-    const response = await spotify.createPlaylist(req.body)
+    const response = await spotify.createPlaylist(req.body);
     console.log('Create Playlist response: ', response.data);
 
-    const redisResult = await redis.setValue("currentPlaylistId", response.data.id);
-    console.log('redisResult currentPlaylistId', redisResult);
+    await redis.setValue("currentPlaylistId", response.data.id);
 
     res.send(response.data.external_urls.spotify);
   } catch (error) {
     console.log('Create Playlist error: ', error);
-    console.log('Create Playlist error: ', error.response);
     res.send('Error creating playlist');
   }
 }
 
 exports.edit = async (req, res) => {
   try {
-    const grt = await spotify.getRefreshToken();
-    console.log('GRT From edit', grt);
+    await spotify.getRefreshToken();
 
     const response = await spotify.editPlaylist(req.body)
     console.log('Edit Playlist response: ', response.data);
@@ -32,7 +28,6 @@ exports.edit = async (req, res) => {
     res.send('Successfully edited playlist');
   } catch (error) {
     console.log('Edit Playlist error: ', error);
-    console.log('Edit Playlist error: ', error.response);
 
     res.send('Error creating playlist');
   }
@@ -40,15 +35,14 @@ exports.edit = async (req, res) => {
 
 exports.getCurrent = async (req, res) => {
   try {
-    const grt = await spotify.getRefreshToken();
-    console.log('GRT From get current playlist', grt);
+    await spotify.getRefreshToken();
 
     const response = await spotify.getCurrentPlaylist();
     console.log('Getting Current Playlist response: ', response.data)
 
     res.send(`Successfully retrieved current playlist ${response.data.id}`);
   } catch (error) {
-    console.log('Get Current Playlists error: ', error);
+    console.log('Get Current Playlists error:', error);
 
     res.send('Error retrieving current playlist');
   }
@@ -56,23 +50,21 @@ exports.getCurrent = async (req, res) => {
 
 exports.getAll = async (req, res) => {
   try {
-    const grt = await spotify.getRefreshToken();
-    console.log('GRT From getAll', grt);
+    await spotify.getRefreshToken();
 
-    const playlistResponse = await spotify.getPlaylists();
-    console.log('Getting Playlists response: ', playlistResponse.data)
+    const response = await spotify.getPlaylists();
+    console.log('Getting Playlists response: ', response.data)
 
     res.send('Successfully retrieved playlists');
   } catch (error) {
-    console.log('Get Playlists error: ', err.response.data);
+    console.log('Get Playlists error: ', error);
     res.send('Error retrieved playlists');
   }
 }
 
 exports.getById = async (req, res) => {
   try {
-    const grt = await spotify.getRefreshToken();
-    console.log('GRT From getById', grt);
+    await spotify.getRefreshToken();
 
     const response = await spotify.getPlaylist(req.params.playlistId);
     console.log('Getting Single Playlist response: ', response.data)
@@ -86,8 +78,7 @@ exports.getById = async (req, res) => {
 
 exports.add = async (req, res) => {
   try {
-    const grt = await spotify.getRefreshToken();
-    console.log('GRT From add', grt);
+    await spotify.getRefreshToken();
 
     const song = spotify.util.getSongURI(req.body.song);
     console.log('song to add is', song);
@@ -101,15 +92,5 @@ exports.add = async (req, res) => {
     console.log('Adding song error: ', error.response.data);
 
     res.send('Error adding song');
-  }
-}
-
-const handleExpiredAccessToken = (err, requestData) => {
-  const error = get(err, 'response.data.error', null);
-
-  if (error) {
-    if (error.status === 401 && error.message === 'The access token expired') {
-      spotify.getRefreshToken(requestData);
-    }
   }
 }
