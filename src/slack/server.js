@@ -14,12 +14,12 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 (async () => {
-  const server = await slackEvents.start(portEvents);
-  console.log(`Listening for events on ${server.address().port}`);
+  await slackEvents.start(portEvents);
+  console.log(`Slack Server started. Listening for message events on port ${portEvents}`);
 })();
 
 app.listen(portCommands, () => {
-  console.log(`Slack Server started. Listening on http://localhost:${portCommands}`)
+  console.log(`Slack Server started. Listening for slash commands on port ${portCommands}`)
 });
 
 
@@ -28,7 +28,7 @@ slackEvents.on('message', async (event) => {
     if (event.text && event.text.includes("https://open.spotify.com/track")) {
       try {
         const response = await axios({
-          url: `${constants.ADD_SONG_TO_PLAYLIST_URL}`,
+          url: `${constants.BASE_SERVER_URL}/playlists`,
           method: 'post',
           data: {
             song: event.text
@@ -49,7 +49,7 @@ app.post('/command', async (req, res) => {
     const [name, description] = text.split(',');
 
     const response = await axios({
-      url: `${constants.CREATE_PLAYLIST_URL}`,
+      url: `${constants.BASE_SERVER_URL}/create`,
       method: 'post',
       data: {
         name,

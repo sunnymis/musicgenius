@@ -18,13 +18,9 @@ exports.authorizationCallback = async (req, res) => {
     const requestCode = req.query.code;
     const response = await spotify.getAccessToken(requestCode);
 
-    redis.client.set("accessToken", response.data.access_token, redis.print);
-    redis.client.set("expiresIn", response.data.expires_in, redis.print);
-    redis.client.set("refreshToken", response.data.refresh_token, redis.print);
-
-    redis.client.get("accessToken", redis.print);
-    redis.client.get("expiresIn", redis.print);
-    redis.client.get("refreshToken", redis.print);
+    redis.client.set("accessToken", response.data.access_token);
+    redis.client.set("expiresIn", response.data.expires_in);
+    redis.client.set("refreshToken", response.data.refresh_token);
 
     res.send('Successfully authenticated with Spotify');
   } catch (error) {
