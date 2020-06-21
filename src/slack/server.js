@@ -49,7 +49,7 @@ app.post('/command', async (req, res) => {
     const [name, description] = text.split(',');
 
     const response = await axios({
-      url: `${constants.BASE_SERVER_URL}/create`,
+      url: `${constants.BASE_SERVER_URL}/playlists`,
       method: 'post',
       data: {
         name,
