@@ -10,7 +10,8 @@
     "slack": "nodemon src/slack/server.js"
   },
   "devDependencies": {
-    "nodemon": "^2.0.4"
+    "nodemon": "^2.0.4",
+    "prettier": "2.0.5"
   },
   "dependencies": {
     "@slack/events-api": "^2.3.3",

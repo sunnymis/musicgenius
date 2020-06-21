@@ -1,12 +1,8 @@
-const spotify = require('../spotify');
-const constants = require('../constants');
-const redis = require('../redis');
+const spotify = require("../spotify");
+const constants = require("../constants");
+const redis = require("../redis");
 
-const {
-  REDIRECT_URI,
-  SPOTIFY_CLIENT_ID,
-  SCOPES
-} = constants;
+const { REDIRECT_URI, SPOTIFY_CLIENT_ID, SCOPES } = constants;
 
 exports.getUrl = (req, res) => {
   url = exports.getAuthorizationUrl();
@@ -22,22 +18,22 @@ exports.authorizationCallback = async (req, res) => {
     redis.client.set("expiresIn", response.data.expires_in);
     redis.client.set("refreshToken", response.data.refresh_token);
 
-    res.send('Successfully authenticated with Spotify');
+    res.send("Successfully authenticated with Spotify");
   } catch (error) {
-    console.log('getAccessToken error:', error);
-  };
-}
+    console.log("getAccessToken error:", error);
+  }
+};
 
 exports.encodeAuthorizationToBase64 = () => {
   const stringToEncode = `${process.env.SPOTIFY_CLIENT_ID}:${process.env.SPOTIFY_CLIENT_SECRET}`;
 
-  return Buffer.from(stringToEncode).toString('base64')
-}
+  return Buffer.from(stringToEncode).toString("base64");
+};
 
 exports.getAuthorizationUrl = () => {
   const params = {
     client_id: SPOTIFY_CLIENT_ID,
-    response_type: 'code',
+    response_type: "code",
     redirect_uri: REDIRECT_URI,
     scope: SCOPES,
     show_dialog: false,
@@ -46,7 +42,7 @@ exports.getAuthorizationUrl = () => {
   serialized = serialize(params);
 
   return `https://accounts.spotify.com/authorize?${serialized}`;
-}
+};
 
 const serialize = (obj) => {
   let str = [];
@@ -55,4 +51,4 @@ const serialize = (obj) => {
       str.push(encodeURIComponent(key) + "=" + encodeURIComponent(obj[key]));
     }
   return str.join("&");
-}
+};

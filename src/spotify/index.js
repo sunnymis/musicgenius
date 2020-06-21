@@ -1,24 +1,24 @@
-const axios = require('axios');
-const auth = require('../authentication');
-const redis = require('../redis');
-const constants = require('../constants');
-const util = require('./util');
+const axios = require("axios");
+const auth = require("../authentication");
+const redis = require("../redis");
+const constants = require("../constants");
+const util = require("./util");
 
 exports.util = util;
 
 exports.getAccessToken = (requestCode) => {
   return axios({
-    url: 'https://accounts.spotify.com/api/token',
-    method: 'post',
+    url: "https://accounts.spotify.com/api/token",
+    method: "post",
     params: {
-      grant_type: 'authorization_code',
+      grant_type: "authorization_code",
       code: requestCode,
       redirect_uri: constants.REDIRECT_URI,
     },
     headers: {
-      'Accept': 'application/json',
-      'Content-Type': 'application/x-www-form-urlencoded',
-      'Authorization': `Basic ${auth.encodeAuthorizationToBase64()}`
+      Accept: "application/json",
+      "Content-Type": "application/x-www-form-urlencoded",
+      Authorization: `Basic ${auth.encodeAuthorizationToBase64()}`,
     },
   });
 };
@@ -28,27 +28,26 @@ exports.getRefreshToken = async () => {
     const refreshToken = await redis.getValue("refreshToken");
 
     const response = await axios({
-      url: 'https://accounts.spotify.com/api/token',
-      method: 'post',
+      url: "https://accounts.spotify.com/api/token",
+      method: "post",
       params: {
-        grant_type: 'refresh_token',
+        grant_type: "refresh_token",
         refresh_token: refreshToken,
       },
       headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'Authorization': `Basic ${auth.encodeAuthorizationToBase64()}`
+        Accept: "application/json",
+        "Content-Type": "application/x-www-form-urlencoded",
+        Authorization: `Basic ${auth.encodeAuthorizationToBase64()}`,
       },
     });
 
-    console.log('Received refreshed accessToken');
+    console.log("Received refreshed accessToken");
 
     const newAccessToken = response.data.access_token;
 
     await redis.setValue("accessToken", newAccessToken);
 
     return newAccessToken;
-
   } catch (error) {
     console.log("Error Getting Refreshed Access Token: ", error);
   }
@@ -58,9 +57,9 @@ exports.createPlaylist = async (data) => {
   const accessToken = await redis.getValue("accessToken");
   return axios({
     url: `https://api.spotify.com/v1/users/${constants.SPOTIFY_USER}/playlists`,
-    method: 'post',
+    method: "post",
     headers: {
-      'Authorization': 'Bearer ' + accessToken
+      Authorization: "Bearer " + accessToken,
     },
     data: {
       public: false,
@@ -76,9 +75,9 @@ exports.editPlaylist = async (data) => {
 
   return axios({
     url: `https://api.spotify.com/v1/playlists/${currentPlaylistId}`,
-    method: 'put',
+    method: "put",
     headers: {
-      'Authorization': 'Bearer ' + accessToken
+      Authorization: "Bearer " + accessToken,
     },
     data,
   });
@@ -89,24 +88,24 @@ exports.getPlaylists = async () => {
 
   return axios({
     url: `https://api.spotify.com/v1/users/${constants.SPOTIFY_USER}/playlists`,
-    method: 'get',
+    method: "get",
     headers: {
-      'Authorization': 'Bearer ' + accessToken
+      Authorization: "Bearer " + accessToken,
     },
   });
-}
+};
 
 exports.getPlaylist = async (playlistId) => {
   const accessToken = await redis.getValue("accessToken");
 
   return axios({
     url: `https://api.spotify.com/v1/playlists/${playlistId}`,
-    method: 'get',
+    method: "get",
     headers: {
-      'Authorization': 'Bearer ' + accessToken
+      Authorization: "Bearer " + accessToken,
     },
   });
-}
+};
 
 exports.getCurrentPlaylist = async () => {
   const accessToken = await redis.getValue("accessToken");
@@ -114,12 +113,12 @@ exports.getCurrentPlaylist = async () => {
 
   return axios({
     url: `https://api.spotify.com/v1/playlists/${currentPlaylistId}`,
-    method: 'get',
+    method: "get",
     headers: {
-      'Authorization': 'Bearer ' + accessToken
+      Authorization: "Bearer " + accessToken,
     },
   });
-}
+};
 
 exports.addSongToPlaylist = async (songs) => {
   const accessToken = await redis.getValue("accessToken");
@@ -127,13 +126,13 @@ exports.addSongToPlaylist = async (songs) => {
 
   return axios({
     url: `https://api.spotify.com/v1/playlists/${currentPlaylistId}/tracks`,
-    method: 'post',
+    method: "post",
     headers: {
-      'Authorization': 'Bearer ' + accessToken,
-      'Content-Type': 'application/json'
+      Authorization: "Bearer " + accessToken,
+      "Content-Type": "application/json",
     },
     data: {
-      uris: songs
+      uris: songs,
     },
   });
-}
+};
