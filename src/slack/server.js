@@ -28,7 +28,7 @@ slackEvents.on('message', async (event) => {
     if (event.text && event.text.includes("https://open.spotify.com/track")) {
       try {
         const response = await axios({
-          url: `${constants.BASE_SERVER_URL}/playlists`,
+          url: `${constants.BASE_SERVER_URL}/playlist`,
           method: 'post',
           data: {
             song: event.text

@@ -76,7 +76,7 @@ exports.getById = async (req, res) => {
   }
 }
 
-exports.add = async (req, res) => {
+exports.addSongToCurrent = async (req, res) => {
   try {
     await spotify.getRefreshToken();
 

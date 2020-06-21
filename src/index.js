@@ -17,11 +17,13 @@ app.get('/authorized', auth.authorizationCallback);
 
 // Playlists
 app.post('/create', playlists.create)
+
 app.get('/playlist', playlists.getCurrent)
 app.put('/playlist', playlists.editCurrent)
+app.post('/playlist', playlists.addSongToCurrent)
+
 app.get('/playlists', playlists.getAll)
 app.get('/playlists/:playlistId', playlists.getById)
-app.post('/playlists', playlists.add)
 
 
 console.log(auth.getAuthorizationUrl());
